@@ -3,7 +3,7 @@
  */
 package com.github.xalnite.util;
 
-public class Library {
+public class Option {
     public boolean someLibraryMethod() {
         return true;
     }
