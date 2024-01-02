@@ -6,9 +6,9 @@ package com.github.xalnite.util;
 import org.testng.annotations.*;
 import static org.testng.Assert.*;
 
-public class LibraryTest {
+public class OptionTest {
     @Test public void someLibraryMethodReturnsTrue() {
-        Library classUnderTest = new Library();
+        Option classUnderTest = new Option();
         assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod should return 'true'");
     }
 }
