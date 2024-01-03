@@ -6,11 +6,11 @@ Java port of public domain getopt
 
 - import static com.github.xalnite.util.Option.\*
 - public static final char EOF = (char)-1
-- public char getopt(String progname, String[] args, String optstring)
-- public String optarg
-- public int optind
-- public boolean opterr
-- public char optopt
+- public static char getopt(String progname, String[] args, String optstring)
+- public static String optarg
+- public static int optind
+- public static boolean opterr
+- public static char optopt
 
 ## about
 
