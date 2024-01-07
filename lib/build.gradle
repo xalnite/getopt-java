@@ -29,6 +29,10 @@ java {
     targetCompatibility = '1.8'
 }
 
+javadoc {
+    title = 'Library for parsing command-line options'
+}
+
 dependencies {
     // Use TestNG framework, also requires calling test.useTestNG() below
     testImplementation 'org.testng:testng:7.5'
