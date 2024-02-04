@@ -68,6 +68,45 @@ public class Option {
      *         in optstring is encountered or {@link EOF} when all command line options are parsed
      */
     public static char getopt(String progname, String[] args, String optstring) {
-        return EOF;
+        char c;
+        int cp;
+
+        if (sp == 1)
+            if (optind >= args.length || !args[optind].startsWith("-")
+                    || args[optind].length() <= 1)
+                return EOF;
+            else if (args[optind].equals("--")) {
+                optind++;
+                return EOF;
+            }
+        optopt = c = args[optind].charAt(sp);
+        if (c == ':' || (cp = optstring.indexOf(c)) < 0) {
+            ERR(progname, ": illegal option -- ", c);
+            if (args[optind].length() <= ++sp) {
+                optind++;
+                sp = 1;
+            }
+            return '?';
+        }
+        if (optstring.charAt(++cp) == ':') {
+            if (args[optind].length() > sp + 1)
+                optarg = args[optind++].substring(sp + 1);
+            else if (++optind >= args.length) {
+                ERR(progname, ": option requires an argument -- ", c);
+                sp = 1;
+                return '?';
+            }
+            else
+                optarg = args[optind++];
+            sp = 1;
+        }
+        else {
+            if (args[optind].length() <= ++sp) {
+                sp = 1;
+                optind++;
+            }
+            optarg = null;
+        }
+        return c;
     }
 }
