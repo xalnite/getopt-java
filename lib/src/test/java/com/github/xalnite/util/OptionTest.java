@@ -3,12 +3,220 @@
  */
 package com.github.xalnite.util;
 
-import org.testng.annotations.*;
-import static org.testng.Assert.*;
+import static com.github.xalnite.util.Option.*;
+import org.assertj.core.api.SoftAssertions;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class OptionTest {
-    @Test public void someLibraryMethodReturnsTrue() {
-        Option classUnderTest = new Option();
-        assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod should return 'true'");
+    @BeforeMethod
+    public void initialize() {
+        opterr = true;
+        optind = 0;
+        optarg = null;
+        optopt = EOF;
+    }
+
+    @Test
+    public void initialState() {
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
+        });
+    }
+
+    @Test
+    public void noArguments() {
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt("cmd", new String[0], ":abf:o:")).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
+        });
+    }
+
+    @Test
+    public void noOptions() {
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt("cmd", new String[] {"foo", "bar", "baz"}, ":abf:o:"))
+                    .isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
+        });
+    }
+
+    @Test
+    public void combinedOptions() {
+        String progname = "cmd";
+        String[] args = new String[] {"-ab", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('a');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('b');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('b');
+        });
+    }
+
+    @Test
+    public void separatedOptions() {
+        String progname = "cmd";
+        String[] args = new String[] {"-a", "-b", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('a');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('b');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('b');
+        });
+    }
+
+    @Test
+    public void combinedOptionsWithArgument() {
+        String progname = "cmd";
+        String[] args = new String[] {"-ba", "-oarg", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('b');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('a');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
+        });
+    }
+
+    @Test
+    public void separatedOptionsWithArgument() {
+        String progname = "cmd";
+        String[] args = new String[] {"-o", "arg", "-b", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(3);
+            softly.assertThat(optopt).isEqualTo('b');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(3);
+            softly.assertThat(optopt).isEqualTo('b');
+        });
+    }
+
+    @Test
+    public void combinedAllOptions() {
+        String progname = "cmd";
+        String[] args = new String[] {"-aobarg", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('a');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("barg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('o');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isEqualTo("barg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('o');
+        });
+    }
+
+    @Test
+    public void terminateOptionParsing() {
+        String progname = "cmd";
+        String[] args = new String[] {"-o", "arg", "--", "-b", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
+
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(3);
+            softly.assertThat(optopt).isEqualTo('o');
+        });
+    }
+
+    @Test
+    public void terminateOptionParsingFromTheBeginning() {
+        String progname = "cmd";
+        String[] args = new String[] {"--", "-o", "arg", "-b", "foo", "bar", "baz"};
+        String optstring = ":abf:o:";
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo(EOF);
+        });
     }
 }
