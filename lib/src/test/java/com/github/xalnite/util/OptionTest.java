@@ -3,6 +3,7 @@
  */
 package com.github.xalnite.util;
 
+import static com.github.xalnite.util.Option.*;
 import org.assertj.core.api.SoftAssertions;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -10,42 +11,42 @@ import org.testng.annotations.Test;
 public class OptionTest {
     @BeforeMethod
     public void initialize() {
-        Option.opterr = true;
-        Option.optind = 0;
-        Option.optarg = null;
-        Option.optopt = Option.EOF;
+        opterr = true;
+        optind = 0;
+        optarg = null;
+        optopt = EOF;
     }
 
     @Test
     public void initialState() {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo(Option.EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
         });
     }
 
     @Test
     public void noArguments() {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt("cmd", new String[0], ":abf:o:")).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo(Option.EOF);
+            softly.assertThat(getopt("cmd", new String[0], ":abf:o:")).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
         });
     }
 
     @Test
     public void noOptions() {
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt("cmd", new String[] {"foo", "bar", "baz"}, ":abf:o:"))
-                    .isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo(Option.EOF);
+            softly.assertThat(getopt("cmd", new String[] {"foo", "bar", "baz"}, ":abf:o:"))
+                    .isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo(EOF);
         });
     }
 
@@ -55,23 +56,23 @@ public class OptionTest {
         String[] args = new String[] {"-ab", "foo", "bar", "baz"};
         String optstring = ":abf:o:";
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('a');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo('a');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('a');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('b');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('b');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('b');
         });
     }
 
@@ -81,23 +82,23 @@ public class OptionTest {
         String[] args = new String[] {"-a", "-b", "foo", "bar", "baz"};
         String optstring = ":abf:o:";
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('a');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('a');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('a');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('b');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(2);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('b');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(2);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('b');
         });
     }
 
@@ -107,29 +108,29 @@ public class OptionTest {
         String[] args = new String[] {"-ba", "-oarg", "foo", "bar", "baz"};
         String optstring = ":abf:o:";
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('b');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('b');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('a');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('a');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('a');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('o');
-            softly.assertThat(Option.optarg).isEqualTo("arg");
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(2);
-            softly.assertThat(Option.optopt).isEqualTo('o');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isEqualTo("arg");
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(2);
-            softly.assertThat(Option.optopt).isEqualTo('o');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
         });
     }
 
@@ -139,23 +140,23 @@ public class OptionTest {
         String[] args = new String[] {"-o", "arg", "-b", "foo", "bar", "baz"};
         String optstring = ":abf:o:";
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('o');
-            softly.assertThat(Option.optarg).isEqualTo("arg");
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(2);
-            softly.assertThat(Option.optopt).isEqualTo('o');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("arg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(2);
+            softly.assertThat(optopt).isEqualTo('o');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('b');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(3);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('b');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(3);
+            softly.assertThat(optopt).isEqualTo('b');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(3);
-            softly.assertThat(Option.optopt).isEqualTo('b');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(3);
+            softly.assertThat(optopt).isEqualTo('b');
         });
     }
 
@@ -165,23 +166,23 @@ public class OptionTest {
         String[] args = new String[] {"-aobarg", "foo", "bar", "baz"};
         String optstring = ":abf:o:";
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('a');
-            softly.assertThat(Option.optarg).isNull();
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isZero();
-            softly.assertThat(Option.optopt).isEqualTo('a');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('a');
+            softly.assertThat(optarg).isNull();
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isZero();
+            softly.assertThat(optopt).isEqualTo('a');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo('o');
-            softly.assertThat(Option.optarg).isEqualTo("barg");
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('o');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo('o');
+            softly.assertThat(optarg).isEqualTo("barg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('o');
 
-            softly.assertThat(Option.getopt(progname, args, optstring)).isEqualTo(Option.EOF);
-            softly.assertThat(Option.optarg).isEqualTo("barg");
-            softly.assertThat(Option.opterr).isTrue();
-            softly.assertThat(Option.optind).isEqualTo(1);
-            softly.assertThat(Option.optopt).isEqualTo('o');
+            softly.assertThat(getopt(progname, args, optstring)).isEqualTo(EOF);
+            softly.assertThat(optarg).isEqualTo("barg");
+            softly.assertThat(opterr).isTrue();
+            softly.assertThat(optind).isEqualTo(1);
+            softly.assertThat(optopt).isEqualTo('o');
         });
     }
 }
